@@ -1,8 +1,7 @@
 package com.mercure.controller;
 
-import com.google.gson.Gson;
-import com.mercure.dto.AuthenticationUserDTO;
 import com.mercure.dto.GroupMemberDTO;
+import com.mercure.dto.RegisterUserDTO;
 import com.mercure.entity.GroupEntity;
 import com.mercure.entity.GroupRoleKey;
 import com.mercure.entity.GroupUser;
@@ -19,7 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.WebUtils;
-
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -165,20 +163,18 @@ public class ApiController {
      * @return a {@link ResponseEntity}
      */
     @PostMapping(value = "/user/register")
-    public ResponseEntity<?> createUser(@RequestBody String data) {
-        Gson gson = new Gson();
-        AuthenticationUserDTO userDTO = gson.fromJson(data, AuthenticationUserDTO.class);
-
+    public ResponseEntity<?> createUser(@RequestBody RegisterUserDTO data) {
+     
         // Check if there are matched in DB
-        if ((userService.checkIfUserNameOrMailAlreadyUsed(userDTO.getFirstName(), userDTO.getEmail()))) {
+        if ((userService.checkIfUserNameOrMailAlreadyUsed(data.firstname(),data.email()))) {
             return ResponseEntity.badRequest().body("Username or mail already used, please try again");
         }
         UserEntity user = new UserEntity();
-        user.setFirstName(userDTO.getFirstName());
-        user.setLastName(userDTO.getLastName());
-        user.setMail(userDTO.getEmail());
-        user.setPassword(userService.passwordEncoder(userDTO.getPassword()));
-        user.setShortUrl(userService.createShortUrl(userDTO.getFirstName(), userDTO.getLastName()));
+        user.setFirstName(data.firstname());
+        user.setLastName(data.lastname());
+        user.setMail(data.firstname());
+        user.setPassword(userService.passwordEncoder(data.password()));
+        user.setShortUrl(userService.createShortUrl(data.firstname(), data.lastname()));
         user.setWsToken(UUID.randomUUID().toString());
         user.setRole(1);
         user.setAccountNonExpired(true);
