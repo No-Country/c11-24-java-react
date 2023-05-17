@@ -172,7 +172,7 @@ public class ApiController {
         UserEntity user = new UserEntity();
         user.setFirstName(data.firstname());
         user.setLastName(data.lastname());
-        user.setMail(data.firstname());
+        user.setMail(data.email());
         user.setPassword(userService.passwordEncoder(data.password()));
         user.setShortUrl(userService.createShortUrl(data.firstname(), data.lastname()));
         user.setWsToken(UUID.randomUUID().toString());
