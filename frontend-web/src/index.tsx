@@ -6,22 +6,25 @@ import { App } from "./App"
 import { AuthContextProvider } from "./context/auth-context"
 import { LoaderProvider } from "./context/loader-context"
 import { ThemeProvider } from "./context/theme-context"
+import { ThemeConfig } from "./context/theme.config"
 import { store } from "./reducers"
 import * as serviceWorker from "./serviceWorker"
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Provider store={store}>
-	 <AuthContextProvider>
-	   <LoaderProvider>
-		<ThemeProvider>
-		  <App/>
-		</ThemeProvider>
-	   </LoaderProvider>
-	 </AuthContextProvider>
-    </Provider>
-  </React.StrictMode>,
-  document.getElementById("root")
+	<React.StrictMode>
+		<Provider store={store}>
+			<AuthContextProvider>
+				<LoaderProvider>
+					<ThemeProvider>
+						<ThemeConfig>
+							<App />
+						</ThemeConfig>
+					</ThemeProvider>
+				</LoaderProvider>
+			</AuthContextProvider>
+		</Provider>
+	</React.StrictMode>,
+	document.getElementById("root")
 )
 
 // If you want your app to work offline and load faster, you can change

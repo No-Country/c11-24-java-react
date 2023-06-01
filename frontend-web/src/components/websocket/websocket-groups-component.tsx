@@ -16,195 +16,195 @@ import { StoreState } from "../../reducers/types"
 import { useLoaderContext } from "../../context/loader-context"
 
 interface IClockType {
-  date: string
+	date: string
 }
 
 interface IWebSocketGroupComponent {
-  groupUrl: string
+	groupUrl: string
 }
 
 const Clock: React.FunctionComponent<IClockType> = ({ date }) => {
-  const [currentCount, setCount] = useState(dateParser(date))
+	const [currentCount, setCount] = useState(dateParser(date))
 
-  useEffect(() => {
-	 const dateInterval = setInterval(() => {
-	   setCount(dateParser(date))
-	 }, 60000)
-	 return () => {
-	   clearInterval(dateInterval)
-	 }
-    },
-    [currentCount]
-  )
-  return (
-    <React.Fragment>
-	 {dateParser(date)}
-    </React.Fragment>
-  )
+	useEffect(() => {
+		const dateInterval = setInterval(() => {
+			setCount(dateParser(date))
+		}, 60000)
+		return () => {
+			clearInterval(dateInterval)
+		}
+	},
+		[currentCount]
+	)
+	return (
+		<React.Fragment>
+			{dateParser(date)}
+		</React.Fragment>
+	)
 }
 
 export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupComponent> = ({ groupUrl }) => {
-  const history = useHistory()
-  const dispatch = useDispatch()
-  const {
-    setLoading
-  } = useLoaderContext()
-  const [loadingState, setLoadingState] = React.useState(true)
-  const { theme } = useThemeContext()
+	const history = useHistory()
+	const dispatch = useDispatch()
+	const {
+		setLoading
+	} = useLoaderContext()
+	const [loadingState, setLoadingState] = React.useState(true)
+	const { theme } = useThemeContext()
 
-  const {
-    isWsConnected,
-    groups
-  } = useSelector(
-    (state: StoreState) => state.globalReducer
-  )
+	const {
+		isWsConnected,
+		groups
+	} = useSelector(
+		(state: StoreState) => state.globalReducer
+	)
 
-  function changeGroupName (url: string) {
-    const currentGroup = groups.find((elt) => elt.group.url === url)
-    if (currentGroup) {
-	 dispatch(setCurrentGroup({ currentGroup }))
-    }
-  }
+	function changeGroupName(url: string) {
+		const currentGroup = groups.find((elt) => elt.group.url === url)
+		if (currentGroup) {
+			dispatch(setCurrentGroup({ currentGroup }))
+		}
+	}
 
-  useEffect(() => {
-    if (groups) {
-	 if (groups.length !== 0) {
-	   changeGroupName(groupUrl)
-	   dispatch(setCurrentGroup({ currentGroup: groups[0] }))
-	   dispatch(setCurrentActiveGroup({ currentActiveGroup: groupUrl }))
-	 }
-	 setLoading(false)
-	 setLoadingState(false)
-    }
-  }, [groups])
+	useEffect(() => {
+		if (groups) {
+			if (groups.length !== 0) {
+				changeGroupName(groupUrl)
+				dispatch(setCurrentGroup({ currentGroup: groups[0] }))
+				dispatch(setCurrentActiveGroup({ currentActiveGroup: groupUrl }))
+			}
+			setLoading(false)
+			setLoadingState(false)
+		}
+	}, [groups])
 
-  function redirectToGroup (id: number, url: string) {
-    if (url !== groupUrl) {
-	 changeGroupName(url)
-	 dispatch(clearChatHistory())
-	 dispatch(setCurrentActiveGroup({ currentActiveGroup: url }))
-	 history.push("/t/messages/" + url)
-    }
-  }
+	function redirectToGroup(id: number, url: string) {
+		if (url !== groupUrl) {
+			changeGroupName(url)
+			dispatch(clearChatHistory())
+			dispatch(setCurrentActiveGroup({ currentActiveGroup: url }))
+			history.push("/t/messages/" + url)
+		}
+	}
 
-  function styleSelectedGroup (selectedUrl: string) {
-    if (generateColorMode(theme) === "light") {
-	 return selectedUrl === groupUrl ? "selected-group-light" : ""
-    }
-    if (generateColorMode(theme) === "dark") {
-	 return selectedUrl === groupUrl ? "selected-group-dark" : ""
-    }
-  }
+	function styleSelectedGroup(selectedUrl: string) {
+		if (generateColorMode(theme) === "light") {
+			return selectedUrl === groupUrl ? "selected-group-light" : ""
+		}
+		if (generateColorMode(theme) === "dark") {
+			return selectedUrl === groupUrl ? "selected-group-dark" : ""
+		}
+	}
 
-  function styleUnreadMessage (isLastMessageSeen: boolean) {
-    return isLastMessageSeen ? theme ? "bold-unread-message-light" : "bold-unread-message-dark" : ""
-  }
+	function styleUnreadMessage(isLastMessageSeen: boolean) {
+		return isLastMessageSeen ? theme ? "bold-unread-message-light" : "bold-unread-message-dark" : ""
+	}
 
-  return (
-    <div
-	 className={"sidebar"}
-	 style={{
-	   borderRight: "1px solid #C8C8C8",
-	   overflowY: "scroll"
-	 }}>
+	return (
+		<div
+			className={"sidebar"}
+			style={{
+				borderRight: "0px solid #C8C8C8",
+				overflowY: "scroll"
+			}}>
 
-	 <Collapse in={!isWsConnected}>
-	   <Alert severity="error">
-		Application is currently unavailable
-	   </Alert>
-	 </Collapse>
+			<Collapse in={!isWsConnected}>
+				<Alert severity="error">
+					La aplicación no está disponible en este momento
+				</Alert>
+			</Collapse>
 
-	 <div style={{
-	   marginTop: "8px",
-	   display: "flex",
-	   justifyContent: "space-between",
-	   alignItems: "center"
-	 }}>
+			<div style={{
+				marginTop: "8px",
+				display: "flex",
+				justifyContent: "center",
+				alignItems: "center"
+			}}>
 				<span style={{
-				  marginLeft: "10px",
-				  fontSize: "20px",
-				  fontWeight: "bold"
+					marginLeft: "10px",
+					fontSize: "20px",
+					fontWeight: "bold",
 				}}>
-                    Discussions
+					Conversaciones
 				</span>
-	 </div>
-	 {
-	   !loadingState && groups && groups.length === 0 &&
-		  <div
-			  className={generateColorMode(theme)}
-			  style={{
-			 display: "flex",
-			 flexDirection: "column",
-			 alignItems: "center",
-			 textAlign: "center",
-			 marginTop: "20px"
-		    }}>
-			  <ErrorIcon fontSize={"large"}/>
-			  <h4>
-				  You don&apos;t have a group yet !
-			  </h4>
-			  <div style={{ display: "flex" }}>
-				  <ArrowRightAltIcon/>
-				  <Link style={{ color: generateLinkColorMode(theme) }} className={"lnk"}
-						to={"/create"}>Create group</Link>
-			  </div>
-		  </div>
-	 }
-	 <List>
-	   {!loadingState && groups && groups.map((groupWrapper) => (
-		<ListItemButton className={styleSelectedGroup(groupWrapper.group.url)} key={groupWrapper.group.id}
-					 onClick={() => redirectToGroup(groupWrapper.group.id, groupWrapper.group.url)}>
-		  <Avatar>
-		    {
-			 groupWrapper.group.groupType === TypeGroupEnum.GROUP
-			   ? <FolderIcon/>
-			   : <AccountCircleIcon/>
-		    }
-		  </Avatar>
-		  <ListItemText
-		    style={{ marginLeft: "5px" }}
-		    primary={
-			 <React.Fragment>
+			</div>
+			{
+				!loadingState && groups && groups.length === 0 &&
+				<div
+					className={generateColorMode(theme)}
+					style={{
+						display: "flex",
+						flexDirection: "column",
+						alignItems: "center",
+						textAlign: "center",
+						marginTop: "20px"
+					}}>
+					<ErrorIcon fontSize={"large"} />
+					<h4>
+						¡Aún no tienes un grupo!
+					</h4>
+					<div style={{ display: "flex" }}>
+						<ArrowRightAltIcon />
+						<Link style={{ color: generateLinkColorMode(theme) }} className={"lnk"}
+							to={"/create"}>Crear grupo</Link>
+					</div>
+				</div>
+			}
+			<List>
+				{!loadingState && groups && groups.map((groupWrapper) => (
+					<ListItemButton className={styleSelectedGroup(groupWrapper.group.url)} key={groupWrapper.group.id}
+						onClick={() => redirectToGroup(groupWrapper.group.id, groupWrapper.group.url)}>
+						<Avatar>
+							{
+								groupWrapper.group.groupType === TypeGroupEnum.GROUP
+									? <FolderIcon />
+									: <AccountCircleIcon />
+							}
+						</Avatar>
+						<ListItemText
+							style={{ marginLeft: "5px" }}
+							primary={
+								<React.Fragment>
 									<span
-									  className={styleUnreadMessage(!groupWrapper.group.lastMessageSeen)}>{groupWrapper.group.name}
+										className={styleUnreadMessage(!groupWrapper.group.lastMessageSeen)}>{groupWrapper.group.name}
 									</span>
-			 </React.Fragment>}
-		    secondary={
-			 <React.Fragment>
+								</React.Fragment>}
+							secondary={
+								<React.Fragment>
 									<span
-									  className={styleUnreadMessage(!groupWrapper.group.lastMessageSeen) + " group-subtitle-color"}
-									  style={{
-									    display: "flex",
-									    justifyContent: "space-between"
-									  }}>
+										className={styleUnreadMessage(!groupWrapper.group.lastMessageSeen) + " group-subtitle-color"}
+										style={{
+											display: "flex",
+											justifyContent: "space-between"
+										}}>
 										<span
-										  className={"clrcstm"}
-										  style={{
-										    overflowX: "hidden",
-										    whiteSpace: "nowrap",
-										    textOverflow: "ellipsis"
-										  }}>
+											className={"clrcstm"}
+											style={{
+												overflowX: "hidden",
+												whiteSpace: "nowrap",
+												textOverflow: "ellipsis"
+											}}>
 											{groupWrapper.group.lastMessageSender ? groupWrapper.group.lastMessageSender + ": " : ""}
-										  {groupWrapper.group.lastMessage
-										    ? groupWrapper.group.lastMessage
-										    : <span
-											 style={{ fontStyle: "italic" }}>No message for the moment</span>}
-										  {groupWrapper.group.lastMessage ?
-										    <span style={{ fontWeight: "bold" }}> · </span> : ""}
-										  {
-										    groupWrapper.group.lastMessage &&
-														<Clock date={groupWrapper.group.lastMessageDate}/>
-										  }
+											{groupWrapper.group.lastMessage
+												? groupWrapper.group.lastMessage
+												: <span
+													style={{ fontStyle: "italic" }}>No hay mensajes por el momento.</span>}
+											{groupWrapper.group.lastMessage ?
+												<span style={{ fontWeight: "bold" }}> · </span> : ""}
+											{
+												groupWrapper.group.lastMessage &&
+												<Clock date={groupWrapper.group.lastMessageDate} />
+											}
 										</span>
 									</span>
-			 </React.Fragment>}
-		  />
-		</ListItemButton>
-	   ))}
-	   {
-		loadingState && <SkeletonLoader/>
-	   }
-	 </List>
-    </div>
-  )
+								</React.Fragment>}
+						/>
+					</ListItemButton>
+				))}
+				{
+					loadingState && <SkeletonLoader />
+				}
+			</List>
+		</div>
+	)
 }

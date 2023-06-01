@@ -17,10 +17,10 @@ export const ThemeProvider: React.FunctionComponent<any> = ({ children }) => {
 
   return (
     <ThemeContext.Provider value={{
-	 theme,
-	 toggleTheme
+      theme,
+      toggleTheme
     }}>
-	 {children}
+      {children}
     </ThemeContext.Provider>
   )
 }

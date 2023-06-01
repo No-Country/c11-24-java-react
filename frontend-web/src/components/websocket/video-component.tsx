@@ -186,7 +186,7 @@ export const VideoComponent = (): JSX.Element => {
 	 return true
     } catch (error) {
 	 // eslint-disable-next-line no-console
-	 console.error("Error accessing media devices.", error)
+	 console.error("Error al acceder a los dispositivos multimedia.", error)
 	 return false
     }
   }

@@ -7,62 +7,62 @@ import { GroupUserModel } from "../../interface-contract/group-user-model"
 import { generateIconColorMode } from "../utils/enable-dark-mode"
 
 interface AllUsersDialogType {
-  setOpen: (open: boolean) => void
-  usersList: GroupUserModel[]
-  open: boolean
-  dialogTitle: string
-  action: (userId: string | number) => void
+	setOpen: (open: boolean) => void
+	usersList: GroupUserModel[]
+	open: boolean
+	dialogTitle: string
+	action: (userId: string | number) => void
 }
 
 export const AllUsersDialog: React.FunctionComponent<AllUsersDialogType> = ({
-  usersList,
-  open,
-  setOpen,
-  dialogTitle,
-  action
+	usersList,
+	open,
+	setOpen,
+	dialogTitle,
+	action
 }) => {
-  const { theme } = useThemeContext()
-  const { user } = useAuthContext()
+	const { theme } = useThemeContext()
+	const { user } = useAuthContext()
 
-  return (
-    <Dialog
-	 onClose={(event, reason) => {
-	   if (reason === "backdropClick") setOpen(false)
-	 }}
-	 scroll={"paper"}
-	 aria-labelledby="simple-dialog-title"
-	 fullWidth
-	 open={open}>
-	 <DialogTitle id="simple-dialog-title">{dialogTitle}</DialogTitle>
-	 <List>
-	   {
-		usersList && usersList.map((users) => (
-		  <ListItemButton key={users.userId} disabled={users.userId === user?.id}
-					   onClick={() => action(users.userId)}>
-		    <ListItemAvatar>
-			 <Avatar>
-			   <AccountCircleIcon
-				style={{ color: generateIconColorMode(theme) }}/>
-			 </Avatar>
-		    </ListItemAvatar>
-		    <ListItemText primary={
-			 <React.Fragment>
+	return (
+		<Dialog
+			onClose={(event, reason) => {
+				if (reason === "backdropClick") setOpen(false)
+			}}
+			scroll={"paper"}
+			aria-labelledby="simple-dialog-title"
+			fullWidth
+			open={open}>
+			<DialogTitle id="simple-dialog-title">{dialogTitle}</DialogTitle>
+			<List>
+				{
+					usersList && usersList.map((users) => (
+						<ListItemButton key={users.userId} disabled={users.userId === user?.id}
+							onClick={() => action(users.userId)}>
+							<ListItemAvatar>
+								<Avatar>
+									<AccountCircleIcon
+										style={{ color: generateIconColorMode(theme) }} />
+								</Avatar>
+							</ListItemAvatar>
+							<ListItemText primary={
+								<React.Fragment>
 									<span style={{
-									  display: "flex",
-									  justifyContent: "space-around"
+										display: "flex",
+										justifyContent: "space-around"
 									}}>
 										{users.firstName + " " + users.lastName}
-									  {
-									    users.userId === user?.id && " (You)"
-									  }
+										{
+											users.userId === user?.id && " (Tu)"
+										}
 									</span>
-			 </React.Fragment>
-		    }
-		    />
-		  </ListItemButton>
-		))
-	   }
-	 </List>
-    </Dialog>
-  )
+								</React.Fragment>
+							}
+							/>
+						</ListItemButton>
+					))
+				}
+			</List>
+		</Dialog>
+	)
 }

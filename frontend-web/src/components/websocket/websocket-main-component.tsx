@@ -23,37 +23,37 @@ export const WebSocketMainComponent: React.FunctionComponent = (): JSX.Element =
   useEffect(() => {
     console.log("GROUP CHANGE", currentActiveGroup)
     if (isStringUUIDType(currentActiveGroup)) {
-	 console.log("NEW GROUP URL", currentActiveGroup)
-	 setGroupUrl(currentActiveGroup)
+      console.log("NEW GROUP URL", currentActiveGroup)
+      setGroupUrl(currentActiveGroup)
     } else {
-	 const groupUrl = window.location.pathname.split("/").slice(-1)[0]
-	 if (isStringUUIDType(groupUrl)) {
-	   setGroupUrl(groupUrl)
-	 }
+      const groupUrl = window.location.pathname.split("/").slice(-1)[0]
+      if (isStringUUIDType(groupUrl)) {
+        setGroupUrl(groupUrl)
+      }
     }
   }, [currentActiveGroup])
 
   useEffect(() => {
-    document.title = "Messages | FLM"
+    document.title = "Mensajes | TokTu"
     return () => {
-	 if (ws) {
-	   ws.deactivate()
-	 }
+      if (ws) {
+        ws.deactivate()
+      }
     }
   }, [])
 
   return (
-    <div className={generateColorMode(theme)}
-	    style={{
-		 height: "calc(100% - 64px)",
-		 display: "flex",
-		 justifyContent: "space-between"
-	    }}>
-	 <WebsocketContextProvider>
-	   <WebsocketGroupsComponent groupUrl={groupUrlProps}/>
-	   <WebSocketChatComponent groupUrl={groupUrlProps}/>
-	   <WebSocketGroupActionComponent groupUrl={groupUrlProps}/>
-	 </WebsocketContextProvider>
+    <div className={generateColorMode(theme) }
+      style={{
+        height: "calc(100% - 64px)",
+        display: "flex",
+        justifyContent: "space-between"
+      }}>
+      <WebsocketContextProvider>
+        <WebsocketGroupsComponent groupUrl={groupUrlProps} />
+        <WebSocketChatComponent groupUrl={groupUrlProps} />
+        <WebSocketGroupActionComponent groupUrl={groupUrlProps} />
+      </WebsocketContextProvider>
     </div>
   )
 }

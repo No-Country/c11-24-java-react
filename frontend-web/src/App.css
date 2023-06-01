@@ -1,96 +1,179 @@
 #root {
-    height: 100%;
+  height: 100%;
 }
 
 ::-webkit-scrollbar {
-    width: 10px;
+  width: 10px;
 }
 
 ::-webkit-scrollbar-track {
-    background: #656565;
+  background: #656565;
+  margin-top: -100px;
+  /* background: red; */
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-    background: #c4c4c4;
+  background: #c4c4c4;
+  /* background: red; */
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-    background: #525252;
+  background: #525252;
+  /* background: red; */
 }
 
 .msg {
-    white-space: pre-wrap;
-    padding: 2px 0 2px 5px;
+  white-space: pre-wrap;
+  padding: 2px 0 2px 5px;
 }
 
 .bold-unread-message-light {
-    font-weight: bold !important;
-    color: white !important;
+  font-weight: bold !important;
+  color: white !important;
 }
 
 .bold-unread-message-dark {
-    font-weight: bold !important;
-    color: black !important;
+  font-weight: bold !important;
+  color: black !important;
 }
 
 .hover-msg-light:hover {
-    background-color: cornflowerblue;
+  background-color: rgba(5, 229, 222, 0.1);
+  /*este color es para el dark, falta para el light */
 }
 
 .hover-msg-dark:hover {
-    background-color: #262626;
+  background-color: rgba(5, 229, 222, 0.1);
+  /*este color es para el dark, falta para el light */
 }
 
 .selected-group-light {
-    background-color: cornflowerblue !important;
+  background-color: rgba(110, 229, 222, 0.3) !important;
+  /*este color es para el dark, falta para el light */
 }
 
 .selected-group-dark {
-    background-color: #262626 !important;
+  background-color: rgba(5, 229, 222, 0.3) !important;
+  /*este color es para el dark, falta para el light */
 }
 
 .group-subtitle-color {
-    color: #787878
+  color: #787878
+    /* color: red; */
 }
 
 /************OVERRIDE MATERIAL UI STYLES******************************************************************************/
 
-.MuiButton-root {
+/*.MuiButton-root {
     color: inherit !important;
 }
+*/
 
 .MuiFormControl-marginNormal {
-    margin: 0 !important;
+  margin: 0 !important;
 }
 
 /************ OVERRIDE ******************************************************************************/
 .lnk {
-    text-decoration: none;
+  text-decoration: none;
+}
+
+.lnks {
+  text-decoration: none;
+  color: #9747FF !important;
 }
 
 .mnu {
-    display: flex;
+  display: flex;
 }
 
 .clrcstm {
-    color: inherit;
-    font-weight: inherit;
+  /* color: inherit; */
+  font-weight: inherit;
 }
 
 /************ DARK & LIGHT MODE ******************************************************************************/
 .dark {
-    color: white;
-    background-color: #393939;
+  color: white;
+  /* background-color: #393939; */
+  background-color: #202225;
+
+}
+
+.dark input:-webkit-autofill,
+.dark input:-webkit-autofill:hover,
+.dark input:-webkit-autofill:focus,
+.dark textarea:-webkit-autofill,
+.dark textarea:-webkit-autofill:hover,
+.dark textarea:-webkit-autofill:focus,
+.dark select:-webkit-autofill,
+.dark select:-webkit-autofill:hover,
+.dark select:-webkit-autofill:focus {
+  border: 1px solid none;
+  -webkit-text-fill-color: white;
+  -webkit-box-shadow: 0 0 0px 1000px #0000000a inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+/*
+color: theme === "dark" ? "#202225" : "white", backgroundColor: theme === "dark" ? "white" : "#202225"}
+*/
+.dark button {
+  color: #202225;
+  background-color: white;
 }
 
 .light {
-    color: black;
-    background-color: #ffffff;
-    /*background-color: #A9A9A9*/
+  color: #787878;
+  background-color: #ffffff;
+}
+
+.light input:-webkit-autofill,
+.light input:-webkit-autofill:hover,
+.light input:-webkit-autofill:focus,
+.light textarea:-webkit-autofill,
+.light textarea:-webkit-autofill:hover,
+.light textarea:-webkit-autofill:focus,
+.light select:-webkit-autofill,
+.light select:-webkit-autofill:hover,
+.light select:-webkit-autofill:focus {
+  border: 1px solid none;
+  -webkit-text-fill-color: black;
+  -webkit-box-shadow: 0 0 0px 1000px #0000000a inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
+.light button {
+  color: white;
+  background-color: #202225;
 }
 
 .jsLink {
-    color: white;
+  color: white;
+}
+
+.header-visible {
+  transform: translateY(0);
+  transition: transform 0.3s ease-in-out;
+}
+
+.header-hidden {
+  transform: translateY(-80%);
+  transition: transform 0.3s ease-in-out;
+}
+
+.homeBackground {
+  background-image: url("LOGUINIMAGE.png");
+  background-repeat: no-repeat;
+  background-size: 65% auto;
+  background-position: bottom left;
+}
+
+.loginBackground {
+  background-image: url("LOGUINIMAGE.png");
+  background-repeat: no-repeat;
+  background-size: 65% auto;
+  background-position: bottom left;
 }

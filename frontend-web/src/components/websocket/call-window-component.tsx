@@ -62,15 +62,15 @@ export const CallWindowComponent: React.FunctionComponent<{ userId: number, grou
 	   <DialogTitle id="alert-dialog-title">{"Someone is calling you"}</DialogTitle>
 	   <DialogContent>
 		<DialogContentText id="alert-dialog-description">
-		  Do you want to answer this call ? You can accept or deny the call
+			¿Quieres responder a esta llamada? Puedes aceptar o rechazar la llamada.
 		</DialogContentText>
 	   </DialogContent>
 	   <DialogActions>
 		<Button onClick={() => handleClose()} color="primary">
-		  Deny
+		  Rechazar
 		</Button>
 		<Button onClick={() => startCall()} color="primary">
-		  Accept
+		  Aceptar
 		</Button>
 	   </DialogActions>
 	 </Dialog>

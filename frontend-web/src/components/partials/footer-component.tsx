@@ -7,11 +7,11 @@ export const FooterComponent = () => {
 	const { theme } = useThemeContext()
 
 	return (
-		<Box mt={5}>
+		<Box mt={3}>
 			<Typography variant="body2" color="inherit" align="center">
 				<a className={"clrcstm lnk" + generateColorMode(theme)} target={"_blank"}
-					href={"https://github.com/Thibaut-Mouton/react-spring-messenger-project"} rel="noreferrer">
-          FastLiteMessage - Open source software
+					/*href={"https://github.com/Thibaut-Mouton/react-spring-messenger-project"}*/ rel="noreferrer">
+          TokTu - Open source software
 				</a>
 				{" - "}
 				{new Date().getFullYear()}

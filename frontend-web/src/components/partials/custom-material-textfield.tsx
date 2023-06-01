@@ -8,28 +8,47 @@ const StyledComp = styled(TextField, {
 })<{ myProp: string }>(({
   myProp,
 }) => ({
+  // Este caso es para cuando se hace foco en el label
   "& label.Mui-focused": {
-    color: myProp === "dark" ? "white" : "black",
+    color: myProp === "dark" ? "white" : "gray",
   },
+  // Este caso es para la letra dentro del input
   "& .MuiInputLabel-formControl": {
-    color: myProp === "dark" ? "white" : "black",
+    color: myProp === "dark" ? "white" : "gray",
   },
+  // Este caso es para el color del subrayado del input
   "& .MuiInput-underline": {
-    color: myProp === "dark" ? "white" : "black",
+    color: myProp === "dark" ? "white" : "gray",
   },
+  // Este caso es para el color del texto de entrada del input
   "& .MuiOutlinedInput-input": {
     color: myProp === "dark" ? "white" : "black",
   },
+  // A partir de aquí se establecen los estilos del contenedor del input
   "& .MuiOutlinedInput-root": {
+    // Este caso es cuando esta sin foco el input
     "& fieldset": {
-	 borderColor: myProp === "dark" ? "white" : "black",
+	  borderColor: myProp === "dark" ? "rgb(5, 229, 223, 0.5)" : "rgb(5, 229, 223, 0.5)",
+    //borderRadius: "15px",
     },
+    // Este caso es cuando se le hace hover al input
     "&:hover fieldset": {
-	 borderColor: myProp === "dark" ? "white" : "black",
+	 borderColor: myProp === "dark" ? "#05E5DF" : "#05E5DF",
     },
+      // Este caso es cuando se le hace foco al input
     "&.Mui-focused fieldset": {
-	 borderColor: myProp === "dark" ? "white" : "black",
+      borderColor: myProp === "dark" ? "#05E5DF" : "#05E5DF",
+      //backgroundColor: myProp === "dark" ? "#202225" : "white",
+      color: myProp === "dark" ? "white" : "#202225",
     },
+    // "& input:-internal-autofill-selected": {
+    //   backgroundColor: myProp === "dark" ? "#202225" : "white",
+    // },
+    // "&.MuiAutocomplete-inputRoot": {
+    //   borderColor: myProp === "dark" ? "#05E5DF" : "#05E5DF",
+    //   backgroundColor: myProp === "dark" ? "#202225" : "white",
+    //   color: myProp === "dark" ? "white" : "#202225",
+    // },
   },
 }))
 
@@ -81,6 +100,13 @@ export const CustomTextField: FunctionComponent<ICustomMaterialTextField> = (pro
 	   type={props.type}
 	   onKeyUp={(event) => submitForm(event)}
 	   onKeyDown={(event) => submitForm(event)}
+     InputProps={{
+      //step: 300, // 5 min
+      style: {
+        borderRadius: "15px",
+        //backgroundColor: theme === "dark" ? "#22" : "white",
+        },
+    }}
 	 />
     </React.Fragment>
   )

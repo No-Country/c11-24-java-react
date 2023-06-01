@@ -1,3 +1,5 @@
 body, html {
-    background-color: #4A4A4A;
+    /* background-color: #4A4A4A; */
+    /*background-color: white;*/
+    height: 100% !important;
 }

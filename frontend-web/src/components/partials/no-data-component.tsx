@@ -9,7 +9,7 @@ export const NoDataComponent = (): JSX.Element => {
 	 <div style={{ textAlign: "center" }}>
 	   <CommentsDisabledIcon fontSize={"large"}/>
 	 </div>
-	 <h3>No conversation selected. You can open one or create a new conversation.</h3>
+	 <h3>No se ha seleccionado ninguna conversación. Puedes abrir una o crear una nueva conversación.</h3>
     </Box>
   )
 }

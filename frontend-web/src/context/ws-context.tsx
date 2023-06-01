@@ -76,7 +76,7 @@ export const WebsocketContextProvider: React.FunctionComponent<any> = ({ childre
 		  alert: {
 		    alert: "success",
 		    isOpen: true,
-		    text: `you left the group ${groupName}`
+		    text: `Has abandonado el grupo ${groupName}`
 		  }
 		}))
 		break
@@ -122,12 +122,12 @@ export const WebsocketContextProvider: React.FunctionComponent<any> = ({ childre
     }
 
     wsObj.onWebSocketClose = (evt) => {
-	 console.log("ERROR DURING HANDSHAKE WITH SERVER", evt)
+	 console.log("ERROR DURANTE EL INTERCAMBIO DE DATOS CON EL SERVIDOR", evt)
 	 dispatch(wsHealthCheckConnected({ isWsConnected: false }))
     }
 
     wsObj.onWebSocketError = (evt) => {
-	 console.log("Cannot connect to server", evt)
+	 console.log("No se puede conectar al servidor", evt)
     }
     wsObj.activate()
   }

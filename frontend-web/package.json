@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "start": "tsc && react-scripts --openssl-legacy-provider start",
-    "start:test": "tsc && set PORT=8080 && react-scripts --openssl-legacy-provider start",
+    "start": "tsc && react-scripts start",
+    "start:test": "tsc && set PORT=8080 && react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "lint": "eslint -c .eslintrc.json --ext .ts,.tsx .",
@@ -23,6 +23,7 @@
     "@testing-library/user-event": "13.2.1",
     "@types/react-router-dom": "^5.3.3",
     "axios": "0.27.2",
+    "dependencies": "^0.0.1",
     "history": "5.0.0",
     "moment": "2.29.1",
     "react": "17.0.2",
