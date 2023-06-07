@@ -3,6 +3,7 @@ package com.mercure.controller;
 import com.google.gson.Gson;
 import com.mercure.dto.AuthenticationUserDTO;
 import com.mercure.dto.GroupMemberDTO;
+import com.mercure.dto.RegisterUserDTO;
 import com.mercure.entity.GroupEntity;
 import com.mercure.entity.GroupRoleKey;
 import com.mercure.entity.GroupUser;
@@ -165,20 +166,18 @@ public class ApiController {
      * @return a {@link ResponseEntity}
      */
     @PostMapping(value = "/user/register")
-    public ResponseEntity<?> createUser(@RequestBody String data) {
-        Gson gson = new Gson();
-        AuthenticationUserDTO userDTO = gson.fromJson(data, AuthenticationUserDTO.class);
+    public ResponseEntity<?> createUser(@RequestBody RegisterUserDTO data) {
 
         // Check if there are matched in DB
-        if ((userService.checkIfUserNameOrMailAlreadyUsed(userDTO.getFirstName(), userDTO.getEmail()))) {
-            return ResponseEntity.badRequest().body("Usuario o correo actualmente existe, por favor use otro");
+        if ((userService.checkIfUserNameOrMailAlreadyUsed(data.firstname(),data.email()))) {
+            return ResponseEntity.badRequest().body("Username or mail already used, please try again");
         }
         UserEntity user = new UserEntity();
-        user.setFirstName(userDTO.getFirstName());
-        user.setLastName(userDTO.getLastName());
-        user.setMail(userDTO.getEmail());
-        user.setPassword(userService.passwordEncoder(userDTO.getPassword()));
-        user.setShortUrl(userService.createShortUrl(userDTO.getFirstName(), userDTO.getLastName()));
+        user.setFirstName(data.firstname());
+        user.setLastName(data.lastname());
+        user.setMail(data.email());
+        user.setPassword(userService.passwordEncoder(data.password()));
+        user.setShortUrl(userService.createShortUrl(data.firstname(), data.lastname()));
         user.setWsToken(UUID.randomUUID().toString());
         user.setRole(1);
         user.setAccountNonExpired(true);
@@ -187,10 +186,10 @@ public class ApiController {
         user.setEnabled(true);
         try {
             userService.save(user);
-            log.info("Usuario creado satisfactoriamente");
+            log.info("User saved successfully");
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            log.error("Error mientras se registra el usuario : {}", e.getMessage());
+            log.error("Error while registering user : {}", e.getMessage());
         }
         return ResponseEntity.status(500).build();
     }
