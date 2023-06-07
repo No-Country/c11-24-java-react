@@ -149,7 +149,7 @@ public class ApiController {
                         return ResponseEntity.ok().body(userToChange + " fue removido por los administradores de " + groupService.getGroupName(groupUrl));
                     }
                 } catch (Exception e) {
-                    log.warn("Error during performing {} : {}", action, e.getMessage());
+                    log.warn("Error durante la ejecución {} : {}", action, e.getMessage());
                     return ResponseEntity.status(500).build();
                 }
             }
