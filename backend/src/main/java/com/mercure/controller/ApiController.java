@@ -1,7 +1,5 @@
 package com.mercure.controller;
 
-import com.google.gson.Gson;
-import com.mercure.dto.AuthenticationUserDTO;
 import com.mercure.dto.GroupMemberDTO;
 import com.mercure.dto.RegisterUserDTO;
 import com.mercure.entity.GroupEntity;
@@ -158,7 +156,6 @@ public class ApiController {
         return ResponseEntity.status(401).build();
     }
 
-
     /**
      * Register User
      *
@@ -170,7 +167,7 @@ public class ApiController {
 
         // Check if there are matched in DB
         if ((userService.checkIfUserNameOrMailAlreadyUsed(data.firstname(),data.email()))) {
-            return ResponseEntity.badRequest().body("Username or mail already used, please try again");
+            return ResponseEntity.badRequest().body("Usuario o correo actualmente en uso, por favor intente de nuevo");
         }
         UserEntity user = new UserEntity();
         user.setFirstName(data.firstname());
