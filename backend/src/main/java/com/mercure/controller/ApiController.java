@@ -138,15 +138,15 @@ public class ApiController {
                 try {
                     if (action.equals("grant")) {
                         groupUserJoinService.grantUserAdminInConversation(userId, groupId);
-                        return ResponseEntity.ok().body(userToChange + " has been granted administrator to " + groupService.getGroupName(groupUrl));
+                        return ResponseEntity.ok().body(userToChange + " ha sido nombrado administrador del " + groupService.getGroupName(groupUrl));
                     }
                     if (action.equals("delete")) {
                         groupUserJoinService.removeUserFromConversation(userId, groupId);
-                        return ResponseEntity.ok().body(userToChange + " has been removed from " + groupService.getGroupName(groupUrl));
+                        return ResponseEntity.ok().body(userToChange + " fue removido de " + groupService.getGroupName(groupUrl));
                     }
                     if (action.equals("removeAdmin")) {
                         groupUserJoinService.removeUserAdminFromConversation(userId, groupId);
-                        return ResponseEntity.ok().body(userToChange + " has been removed from administrators of " + groupService.getGroupName(groupUrl));
+                        return ResponseEntity.ok().body(userToChange + " fue removido por los administradores de " + groupService.getGroupName(groupUrl));
                     }
                 } catch (Exception e) {
                     log.warn("Error during performing {} : {}", action, e.getMessage());
@@ -171,7 +171,7 @@ public class ApiController {
 
         // Check if there are matched in DB
         if ((userService.checkIfUserNameOrMailAlreadyUsed(userDTO.getFirstName(), userDTO.getEmail()))) {
-            return ResponseEntity.badRequest().body("Username or mail already used, please try again");
+            return ResponseEntity.badRequest().body("Usuario o correo actualmente existe, por favor use otro");
         }
         UserEntity user = new UserEntity();
         user.setFirstName(userDTO.getFirstName());
