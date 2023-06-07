@@ -93,7 +93,7 @@ public class ApiController {
 //            return ResponseEntity.ok().body(addedUsername + " has been added to " + groupService.getGroupName(groupUrl));
             return ResponseEntity.ok().body(groupService.addUserToConversation(userId, groupId));
         } catch (Exception e) {
-            log.error("Error when trying to add user to conversation : {}", e.getMessage());
+            log.error("Error intentando añadir un usuario a la conversación : {}", e.getMessage());
             return ResponseEntity.status(500).build();
         }
     }
@@ -187,10 +187,10 @@ public class ApiController {
         user.setEnabled(true);
         try {
             userService.save(user);
-            log.info("User saved successfully");
+            log.info("Usuario creado satisfactoriamente");
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            log.error("Error while registering user : {}", e.getMessage());
+            log.error("Error mientras se registra el usuario : {}", e.getMessage());
         }
         return ResponseEntity.status(500).build();
     }
