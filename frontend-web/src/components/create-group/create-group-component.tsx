@@ -1,5 +1,5 @@
 import { Button, Container, CssBaseline, Grid, Typography } from "@mui/material"
-import React, { useEffect, useState } from "react" //ChangeEvent, KeyboardEvent
+import React, { useEffect, useState } from "react"
 import { useHistory } from "react-router-dom"
 import { useThemeContext } from "../../context/theme-context"
 import { useDispatch } from "react-redux"
@@ -7,9 +7,11 @@ import { createGroup, setAlerts } from "../../reducers"
 import { CustomTextField } from "../partials/custom-material-textfield"
 import { HttpService } from "../../service/http-service"
 
-export const CreateGroupComponent = () => { // : JSX.Element
+export const CreateGroupComponent = () => {
   const history = useHistory()
   const [groupName, setGroupName] = useState("")
+  const [isCreatingGroup, setIsCreatingGroup] = useState(false)
+  const [isButtonDisabled, setIsButtonDisabled] = useState(false)
   const { theme } = useThemeContext()
   const dispatch = useDispatch()
   const httpService = new HttpService()
@@ -18,14 +20,21 @@ export const CreateGroupComponent = () => { // : JSX.Element
     document.title = "Crear grupo | TokTu"
   }, [])
 
-  function handleChange (event: any) { // ChangeEvent<HTMLInputElement>
+  const rootElement = document.getElementById("root")
+  if (rootElement !== null) {
+    rootElement.style.backgroundColor = theme === "dark" ? "#202225" : "white"
+  }
+
+  function handleChange(event: any) {
     event.preventDefault()
     setGroupName(event.target.value)
   }
 
-  async function createGroupByName (event: any) {
+  async function createGroupByName(event: any) {
     event.preventDefault()
-    if (groupName !== "") {
+    if (groupName !== "" && !isCreatingGroup) {
+      setIsCreatingGroup(true)
+      setIsButtonDisabled(true)
       const res = await httpService.createGroup(groupName)
       dispatch(
         setAlerts({
@@ -41,11 +50,13 @@ export const CreateGroupComponent = () => { // : JSX.Element
       //   pathname: "/t/messages/" + res.data.url,
       // })
       window.location.href = "/t/messages/" + res.data.url
+      setIsCreatingGroup(false)
+      setIsButtonDisabled(false)
       // setAlerts([...alerts, new FeedbackModel(UUIDv4(), `Cannot create group "${groupName}" : ${err.toString()}`, "error", true)])
     }
   }
 
-  function submitGroupCreation (event: any) { // KeyboardEvent<HTMLInputElement> | undefined
+  function submitGroupCreation(event: any) {
     if (event.key === undefined || event.key === "Enter") {
       if (groupName === "") {
         return
@@ -56,9 +67,9 @@ export const CreateGroupComponent = () => { // : JSX.Element
 
   return (
     <div
-      className={theme}
+      className={theme + " imageBackground"}
       style={{
-        // height: "calc(100% - 64px)",
+        height: "calc(100% - 64px)",
         textAlign: "center",
         paddingTop: "40px",
       }}
@@ -85,20 +96,18 @@ export const CreateGroupComponent = () => { // : JSX.Element
                 isMultiline={false}
               />
             </Grid>
-            <div>
               <Grid item xs={12}>
                 <Button
                   className={"button-register-form"}
-                  style={{ margin: "15px 0 0 17px" }}
                   onClick={(event) => createGroupByName(event)}
                   fullWidth
                   variant="outlined"
                   color="primary"
+                disabled={isButtonDisabled}
                 >
                   Crear
                 </Button>
               </Grid>
-            </div>
           </Grid>
         </div>
       </Container>

@@ -42,6 +42,11 @@ export const WebSocketMainComponent: React.FunctionComponent = (): JSX.Element =
     }
   }, [])
 
+  const rootElement = document.getElementById("root")
+	if (rootElement !== null) {
+		rootElement.style.backgroundColor = theme === "dark" ? "#202225" : "white"
+	}
+  
   return (
     <div className={generateColorMode(theme) }
       style={{

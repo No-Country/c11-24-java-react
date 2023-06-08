@@ -97,7 +97,7 @@ export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupCo
 	}
 
 	function styleUnreadMessage(isLastMessageSeen: boolean) {
-		return isLastMessageSeen ? theme ? "bold-unread-message-light" : "bold-unread-message-dark" : ""
+		return isLastMessageSeen ? theme === "light" ? "bold-unread-message-light" : "bold-unread-message-dark" : ""
 	}
 
 	return (
@@ -109,8 +109,8 @@ export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupCo
 			}}>
 
 			<Collapse in={!isWsConnected}>
-				<Alert severity="error">
-					La aplicación no está disponible en este momento
+				<Alert severity="info">
+					Cargando grupos...
 				</Alert>
 			</Collapse>
 
@@ -165,7 +165,7 @@ export const WebsocketGroupsComponent: React.FunctionComponent<IWebSocketGroupCo
 							style={{ marginLeft: "5px" }}
 							primary={
 								<React.Fragment>
-									<span
+									<span id={styleSelectedGroup(groupWrapper.group.url)}
 										className={styleUnreadMessage(!groupWrapper.group.lastMessageSeen)}>{groupWrapper.group.name}
 									</span>
 								</React.Fragment>}

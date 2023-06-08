@@ -10,71 +10,71 @@ import { StoreState } from "../../reducers/types"
 import { setCallIncoming, setCallUrl, setGroupWithCurrentCall } from "../../reducers"
 
 export const CallWindowComponent: React.FunctionComponent<{ userId: number, groupUrl: string }> = ({
-  userId,
-  groupUrl
+	userId,
+	groupUrl
 }) => {
-  const { ws } = useWebSocketContext()
-  const dispatch = useDispatch()
-  const {
-    callStarted,
-    callUrl
-  } = useSelector(
-    (state: StoreState) => state.globalReducer
-  )
+	const { ws } = useWebSocketContext()
+	const dispatch = useDispatch()
+	const {
+		callStarted,
+		callUrl
+	} = useSelector(
+		(state: StoreState) => state.globalReducer
+	)
 
-  const openCallPage = async (event: any) => {
-    event.preventDefault()
-    const startedCallUrl = UUIDv4()
-    if (ws) {
-	 const transport = new RtcTransportDTO(userId, groupUrl, RtcActionEnum.INIT_ROOM)
-	 ws.publish({
-	   destination: `/app/rtc/${startedCallUrl}`,
-	   body: JSON.stringify(transport)
-	 })
-	 const callPage = window.open(`http://localhost:3000/call/${startedCallUrl}`, "_blank") as any
-	 if (callPage) {
-	   callPage.groupUrl = groupUrl
-	   callPage.focus()
-	 }
-	 dispatch(setGroupWithCurrentCall({
-	   roomUrl: startedCallUrl,
-	   groupUrl
-	 }))
-    }
-  }
+	const openCallPage = async (event: any) => {
+		event.preventDefault()
+		const startedCallUrl = UUIDv4()
+		if (ws) {
+			const transport = new RtcTransportDTO(userId, groupUrl, RtcActionEnum.INIT_ROOM)
+			ws.publish({
+				destination: `/app/rtc/${startedCallUrl}`,
+				body: JSON.stringify(transport)
+			})
+			const callPage = window.open(`http://localhost:3000/call/${startedCallUrl}`, "_blank") as any
+			if (callPage) {
+				callPage.groupUrl = groupUrl
+				callPage.focus()
+			}
+			dispatch(setGroupWithCurrentCall({
+				roomUrl: startedCallUrl,
+				groupUrl
+			}))
+		}
+	}
 
-  const handleClose = () => {
-    dispatch(setCallIncoming({ callStarted: false }))
-    dispatch(setCallUrl({ callUrl: "" }))
-  }
+	const handleClose = () => {
+		dispatch(setCallIncoming({ callStarted: false }))
+		dispatch(setCallUrl({ callUrl: "" }))
+	}
 
-  const startCall = () => {
-    dispatch(setCallIncoming({ callStarted: false }))
-    window.open(`http://localhost:3000/call/${callUrl}?mode=join`, "_blank")?.focus()
-  }
+	const startCall = () => {
+		dispatch(setCallIncoming({ callStarted: false }))
+		window.open(`http://localhost:3000/call/${callUrl}?mode=join`, "_blank")?.focus()
+	}
 
-  return (
-    <React.Fragment>
-	 <Button onClick={(event: any) => openCallPage(event)} variant="text" component="span">
-	   <CallIcon/>
-	 </Button>
-	 <Dialog open={callStarted}>
-	   <DialogTitle id="alert-dialog-title">{"Someone is calling you"}</DialogTitle>
-	   <DialogContent>
-		<DialogContentText id="alert-dialog-description">
-			¿Quieres responder a esta llamada? Puedes aceptar o rechazar la llamada.
-		</DialogContentText>
-	   </DialogContent>
-	   <DialogActions>
-		<Button onClick={() => handleClose()} color="primary">
-		  Rechazar
-		</Button>
-		<Button onClick={() => startCall()} color="primary">
-		  Aceptar
-		</Button>
-	   </DialogActions>
-	 </Dialog>
-	 <div id={"remote-video"}/>
-    </React.Fragment>
-  )
+	return (
+		<React.Fragment>
+			<Button onClick={(event: any) => openCallPage(event)} variant="text" component="span">
+				<CallIcon />
+			</Button>
+			<Dialog open={callStarted}>
+				<DialogTitle id="alert-dialog-title">{"Alguien te está llamando"}</DialogTitle>
+				<DialogContent>
+					<DialogContentText id="alert-dialog-description">
+						¿Quieres responder a esta llamada? Puedes aceptarla o rechazarla.
+					</DialogContentText>
+				</DialogContent>
+				<DialogActions>
+					<Button onClick={() => handleClose()} color="primary">
+						Rechazar
+					</Button>
+					<Button onClick={() => startCall()} color="primary">
+						Aceptar
+					</Button>
+				</DialogActions>
+			</Dialog>
+			<div id={"remote-video"} />
+		</React.Fragment>
+	)
 }

@@ -10,8 +10,8 @@ import { useLocation } from "react-router-dom"
 import { useDispatch, useSelector } from "react-redux"
 import { StoreState } from "../../reducers/types"
 import { setAlerts } from "../../reducers"
-// import { ReactComponent as btnHomeLight } from "../public/buttonHomeLight.svg"
-// import { ReactComponent as btnHomeDark } from "../public/buttonHomeDark.svg"
+import { ReactComponent as btnHomeLight } from "./buttonHomeLight.svg"
+import { ReactComponent as btnHomeDark } from "./buttonHomeDark.svg"
 
 export const HeaderComponent: React.FunctionComponent = () => {
 	// Estado para controlar la visibilidad del encabezado
@@ -61,6 +61,17 @@ export const HeaderComponent: React.FunctionComponent = () => {
 		setCookie("pref-theme", theme)
 	}, [theme])
 
+	// useEffect(() => {
+	// 	window.onload = () => {
+	// 	  const rootElement = document.getElementById("root")
+	// 		alert("root element: " + rootElement)
+	// 	  if (rootElement !== null) {
+	// 	    rootElement.style.backgroundColor =
+	// 	      theme === "dark" ? "#202225" : "white"
+	// 	  }
+	// 	}
+	// }, [theme])
+
 	// Efecto para controlar la visibilidad del encabezado al hacer scroll
 	useEffect(() => {
 		// Función para manejar el evento de desplazamiento
@@ -108,7 +119,7 @@ export const HeaderComponent: React.FunctionComponent = () => {
 			}
 		}))
 		// Redirigir al usuario a la página principal ("/")
-		history.push("/")
+		history.push("/login")
 	}
 
 	// Función para generar el loader
@@ -139,19 +150,9 @@ export const HeaderComponent: React.FunctionComponent = () => {
 							borderBottom: "0.5px solid #C8C8C8"
 						}}
 					>
-						<Typography variant="h6">
+						<Typography variant="h6" >
 							<RouterLink className={"lnk clrcstm"} to={"/"}>
-								<span
-									style={{
-										display: "flex",
-										alignItems: "center",
-										flexWrap: "wrap"
-									}}
-								>
-									{/* <SvgIcon component={btnHomeLight} /> */}
-									<ClearAllIcon />
-									<span style={{ letterSpacing: "1px" }}>TokTu</span>
-								</span>
+								<SvgIcon component={theme === "dark" ? btnHomeDark : btnHomeLight} style={{fontSize:46, width: "173px", margin: "18px 0px -10px -50px" }} />
 							</RouterLink>
 						</Typography>
 						<nav className={"lnk clrcstm mnu"}>

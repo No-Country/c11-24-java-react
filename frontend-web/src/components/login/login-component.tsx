@@ -7,7 +7,6 @@ import { useThemeContext } from "../../context/theme-context"
 import { generateLinkColorMode } from "../utils/enable-dark-mode"
 import { FooterComponent } from "../partials/footer-component"
 import { CustomTextField } from "../partials/custom-material-textfield"
-//import { CustomButton } from "../partials/custom-material-button"
 import { HttpService } from "../../service/http-service"
 import { useDispatch } from "react-redux"
 import { setAlerts } from "../../reducers"
@@ -21,7 +20,9 @@ export const LoginComponent: React.FunctionComponent = () => {
 	const dispatch = useDispatch()
 	const { theme } = useThemeContext()
 	const { setLoading } = useLoaderContext()
-	const [rememberData, setRememberData] = useState(false)
+	const [rememberData, setRememberData] = useState(!!localStorage.getItem("userData"))
+	const [isFormComplete, setIsFormComplete] = useState(false)
+
 	const httpService = new HttpService()
 
 	//Hook | Título del documento (pestaña)
@@ -29,13 +30,34 @@ export const LoginComponent: React.FunctionComponent = () => {
 		document.title = "Login | TOKTU"
 	}, [])
 
+	const rootElement = document.getElementById("root")
+	if (rootElement !== null) {
+		rootElement.style.backgroundColor = theme === "dark" ? "#202225" : "white"
+	}
+
+	useEffect(() => {
+		const storedUserData = JSON.parse(localStorage.getItem("userData") ?? "{}")
+		setRememberData(!!localStorage.getItem("userData"))
+		setUsername(storedUserData.username || "")
+		setPassword(storedUserData.password || "")
+		setIsFormComplete(!!(storedUserData.username && storedUserData.password))
+	}, [])
+
+	useEffect(() => {
+		if (rememberData) {
+			localStorage.setItem(
+				"userData",
+				JSON.stringify({ username, password })
+			)
+		} else {
+			localStorage.removeItem("userData")
+		}
+	}, [rememberData, username, password])
+
 	//Actualizo el estado de email y password cuando se cambia
-	function handleChange(e: any) { // ChangeEvent<HTMLInputElement>
+	function handleChange(e: any) {
 		e.preventDefault()
 		switch (e.target.name) {
-			// case "email":
-			// 	setEmail(e.target.value)
-			// 	break
 			case "username":
 				setUsername(e.target.value)
 				break
@@ -45,6 +67,7 @@ export const LoginComponent: React.FunctionComponent = () => {
 			default:
 				throw Error("Whoops ! Algo anduvo mal...")
 		}
+		setIsFormComplete(username !== "" && password !== "")
 	}
 	//verifico si se apretó enter o el evento no tiene info de tecla
 	//si hay datos en los dos campos hago click en login
@@ -106,7 +129,7 @@ export const LoginComponent: React.FunctionComponent = () => {
 
 	return (
 
-		<div className={theme + " loginBackground"}
+		<div className={theme + " imageBackground"}
 			style={{
 				height: "calc(100% - 64px)",
 				//height: "100%"
@@ -116,12 +139,8 @@ export const LoginComponent: React.FunctionComponent = () => {
 					display: "flex",
 					justifyContent: "center"
 				}}>
-					{/* <LockIcon fontSize={"large"}
-						className={generateIconColorMode(theme)}
-					/> */}
 					<Box m={3}>
 						{theme === "dark" ? <img src="../../toktulogoblanco.png" alt="Logo de la página" width="300"></img> : <img src="../../toktulogo.png" alt="Logo de la página" width="300"></img>}
-
 					</Box>
 				</div>
 				<Typography component="h1" variant="h5">
@@ -153,14 +172,14 @@ export const LoginComponent: React.FunctionComponent = () => {
 							/>
 						</Grid>
 					</Grid>
-					<Grid container justifyContent={"space-between"} style={{marginTop: "7px"}}>
-						<Grid item xs={6} style={{ display: "flex", justifyContent: "flex-start"}}>
+					<Grid container justifyContent={"space-between"} style={{ marginTop: "7px" }}>
+						<Grid item xs={6} style={{ display: "flex", justifyContent: "flex-start" }}>
 						<FormControlLabel
-							control={<Checkbox name="remember" color="primary" checked={rememberData} onChange={(e) => setRememberData(e.target.checked)}/>}
+								control={<Checkbox name="remember" color="primary" checked={rememberData} onChange={(e) => setRememberData(e.target.checked)} />}
 							label="Recordarme"
 						/>
 						</Grid>
-						<Grid item xs={6} style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px"}}>
+						<Grid item xs={6} style={{ display: "flex", justifyContent: "flex-end", marginTop: "10px" }}>
 							<Link className={"lnks"}
 								style={{ color: generateLinkColorMode(theme) }}
 								to={"/forgetpassword"}>
@@ -172,7 +191,7 @@ export const LoginComponent: React.FunctionComponent = () => {
 						<Grid item xs={12}>
 							<Button
 								//disabled={email === "" || password === ""}
-								disabled={username === "" || password === ""}
+								disabled={!isFormComplete}
 								className={"button-register-form"}
 								style={{ margin: "8px 0px 10px" }} //
 								onClick={(event) => submitLogin(event)}
@@ -182,8 +201,14 @@ export const LoginComponent: React.FunctionComponent = () => {
 								Ingresar
 							</Button>
 						</Grid>
-
-						<Button
+						<Grid item xs={12}>
+							<Link className={"button-register-form lnk"} to={"/register"}>
+								<Button className={"clrcstm"} variant="contained" style={{ margin: "8px 0 10px" }} fullWidth>
+									Registrarse
+								</Button>
+							</Link>
+							{/* <Button
+								disabled={!isFormComplete}
 							className={"button-register-form"}
 							style={{ margin: "8px 0px 10px" }}
 							component={Link}
@@ -192,10 +217,9 @@ export const LoginComponent: React.FunctionComponent = () => {
 							variant="contained"
 						>
 							Registrarse
-						</Button>
-
+							</Button> */}
+						</Grid>
 					</div>
-
 				</Box>
 				<FooterComponent />
 			</div>

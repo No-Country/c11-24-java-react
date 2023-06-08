@@ -14,229 +14,236 @@ import { CallEnded } from "../partials/video/call-ended"
 import { HttpService } from "../../service/http-service"
 
 const getUuid = (location: string): string => {
-  const temp = location.split("/")
-  return temp[temp.length - 1]
+	const temp = location.split("/")
+	return temp[temp.length - 1]
 }
 
 export const VideoComponent = (): JSX.Element => {
-  const [ws, setWs] = useState<Client | null>()
-  const [currentUserId, setCurrentUserId] = useState<number>(-1)
-  const [isPageAuthorized, setPageStatus] = useState<boolean>(true)
-  const [callEnded, setCallEnded] = useState<boolean>(false)
-  const [currentLocalStream, setLocalStream] = useState<MediaStream | undefined>()
+	const [ws, setWs] = useState<Client | null>()
+	const [currentUserId, setCurrentUserId] = useState<number>(-1)
+	const [isPageAuthorized, setPageStatus] = useState<boolean>(true)
+	const [callEnded, setCallEnded] = useState<boolean>(false)
+	const [currentLocalStream, setLocalStream] = useState<MediaStream | undefined>()
 
-  // const configuration = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] }
-  const configuration = { "iceServers": [] }
-  const [localVideoReady, setLocalVideoState] = useState<boolean>(false)
-  const peerConnection = new RTCPeerConnection(configuration)
-  const location = useLocation()
+	// const configuration = { 'iceServers': [{ 'urls': 'stun:stun.l.google.com:19302' }] }
+	const configuration = { "iceServers": [] }
+	const [localVideoReady, setLocalVideoState] = useState<boolean>(false)
+	const peerConnection = new RTCPeerConnection(configuration)
+	const location = useLocation()
 
-  const isUserInitiateSession = location.search.split("=")[1]
-  const roomUrl = getUuid(location.pathname)
-  const groupUrlFromParent = (window as any).groupUrl
-  const http = new HttpService()
+	const isUserInitiateSession = location.search.split("=")[1]
+	const roomUrl = getUuid(location.pathname)
+	const groupUrlFromParent = (window as any).groupUrl
+	const http = new HttpService()
 
-  peerConnection.addEventListener("connectionstatechange", () => {
-    switch (peerConnection.connectionState) {
-    case "new":
-	 console.log("Connecting...")
-	 break
-    case "connected":
-	 console.log("Online")
-	 break
-    case "disconnected":
-	 console.log("Disconnecting...")
-	 break
-    case "closed":
-	 console.log("Offline")
-	 break
-    case "failed":
-	 console.log("Error")
-	 break
-    default:
-	 console.log("Unknown")
-	 break
-    }
-  })
-
-  peerConnection.addEventListener("icecandidate", (event) => {
-    console.log("EVENT", event.candidate)
-    if (ws && event.candidate) {
-	 const iceCandidateResponse = new RtcTransportDTO(currentUserId, "", RtcActionEnum.ICE_CANDIDATE, undefined, undefined, event.candidate)
-	 ws.publish({
-	   destination: `/app/rtc/${roomUrl}`,
-	   body: JSON.stringify(iceCandidateResponse)
-	 })
-    }
-  })
-
-  peerConnection.addEventListener("icecandidateerror", (event) => {
-    // eslint-disable-next-line no-console
-    console.log("ERROR EVENT", event)
-  })
-
-  // peerConnection.addEventListener('icegatheringstatechange', (event) => {
-  //   console.log('icegatheringstatechange', event)
-  // })
-
-  peerConnection.addEventListener("track", (event) => {
-    const remoteVideo = document.querySelector("video#localVideo") as HTMLVideoElement
-    const [remoteStream] = event.streams
-    remoteVideo.srcObject = remoteStream
-  })
-
-  useEffect(() => {
-    initRTC().then((res) => {
-	 if (res) {
-	   initWs()
-	 }
-    })
-  }, [groupUrlFromParent])
-
-  const initWs = async () => {
-    const { data } = await http.pingRoute()
-    const { user } = data
-    setCurrentUserId(user.id)
-    const wsObj = initWebSocket(user.wsToken)
-
-    setWs(wsObj)
-    wsObj.onConnect = async () => {
-	 wsObj.subscribe(`/topic/rtc/${user.id}`, async (res: IMessage) => {
-	   const rtcTransportDto = JSON.parse(res.body) as RtcTransportDTO
-	   switch (rtcTransportDto.action) {
-	   case RtcActionEnum.SEND_ANSWER: {
-		if (rtcTransportDto.answer) {
-		  await peerConnection.setRemoteDescription(new RTCSessionDescription(rtcTransportDto.answer))
+	peerConnection.addEventListener("connectionstatechange", () => {
+		switch (peerConnection.connectionState) {
+			case "new":
+				console.log("Conectando...")
+				break
+			case "connected":
+				console.log("Online")
+				break
+			case "disconnected":
+				console.log("Desconectando...")
+				break
+			case "closed":
+				console.log("Fuerra de linea")
+				break
+			case "failed":
+				console.log("Error")
+				break
+			default:
+				console.log("Desconocido")
+				break
 		}
-		break
-	   }
-	   case RtcActionEnum.SEND_OFFER: {
-		if (rtcTransportDto.offer) {
-		  await peerConnection.setRemoteDescription(new RTCSessionDescription(rtcTransportDto.offer))
-		  const answer = await peerConnection.createAnswer()
-		  await peerConnection.setLocalDescription(answer)
-		  const answerTransport = new RtcTransportDTO(user.id, "", RtcActionEnum.SEND_ANSWER, undefined, answer)
-		  wsObj.publish({
-		    destination: `/app/rtc/${roomUrl}`,
-		    body: JSON.stringify(answerTransport)
-		  })
+	})
+
+	peerConnection.addEventListener("icecandidate", (event) => {
+		console.log("EVENT", event.candidate)
+		if (ws && event.candidate) {
+			const iceCandidateResponse = new RtcTransportDTO(currentUserId, "", RtcActionEnum.ICE_CANDIDATE, undefined, undefined, event.candidate)
+			ws.publish({
+				destination: `/app/rtc/${roomUrl}`,
+				body: JSON.stringify(iceCandidateResponse)
+			})
 		}
-		break
-	   }
-	   case RtcActionEnum.ICE_CANDIDATE: {
-		if (rtcTransportDto.iceCandidate) {
-		  await peerConnection.addIceCandidate(rtcTransportDto.iceCandidate)
+	})
+
+	peerConnection.addEventListener("icecandidateerror", (event) => {
+		// eslint-disable-next-line no-console
+		console.log("ERROR EVENT", event)
+	})
+
+	// peerConnection.addEventListener('icegatheringstatechange', (event) => {
+	//   console.log('icegatheringstatechange', event)
+	// })
+
+	peerConnection.addEventListener("track", (event) => {
+		const remoteVideo = document.querySelector("video#localVideo") as HTMLVideoElement
+		const [remoteStream] = event.streams
+		remoteVideo.srcObject = remoteStream
+	})
+
+	useEffect(() => {
+		initRTC().then((res) => {
+			if (res) {
+				initWs()
+			}
+		})
+		const handleBeforeUnload = () => {
+			hangOnRoom()
 		}
-		break
-	   }
-	   default:
-		break
-	   }
-	 })
-	 if (isUserInitiateSession === "join") {
-	   const offer = await peerConnection.createOffer()
-	   await peerConnection.setLocalDescription(offer)
-	   const transport = new RtcTransportDTO(user.id, "", RtcActionEnum.JOIN_ROOM, offer)
-	   wsObj.publish({
-		destination: `/app/rtc/${roomUrl}`,
-		body: JSON.stringify(transport)
-	   })
-	 }
-    }
-    wsObj.activate()
-  }
+		window.addEventListener("beforeunload", handleBeforeUnload)
+		return () => {
+			window.removeEventListener("beforeunload", handleBeforeUnload)
+		}
+	}, [groupUrlFromParent])
 
-  const changeVideoStatus = (stopVideo: boolean) => {
-    if (currentLocalStream) {
-	 if (stopVideo) {
-	   currentLocalStream.getTracks().forEach((track) => {
-		track.stop()
-	   })
-	 } else {
-	   currentLocalStream.getTracks().forEach((track) => {
-		peerConnection.addTrack(track, currentLocalStream)
-	   })
-	 }
-    }
-  }
+	const initWs = async () => {
+		const { data } = await http.pingRoute()
+		const { user } = data
+		setCurrentUserId(user.id)
+		const wsObj = initWebSocket(user.wsToken)
 
-  const initRTC = async (): Promise<boolean> => {
-    const url = getUuid(location.pathname)
+		setWs(wsObj)
+		wsObj.onConnect = async () => {
+			wsObj.subscribe(`/topic/rtc/${user.id}`, async (res: IMessage) => {
+				const rtcTransportDto = JSON.parse(res.body) as RtcTransportDTO
+				switch (rtcTransportDto.action) {
+					case RtcActionEnum.SEND_ANSWER: {
+						if (rtcTransportDto.answer) {
+							await peerConnection.setRemoteDescription(new RTCSessionDescription(rtcTransportDto.answer))
+						}
+						break
+					}
+					case RtcActionEnum.SEND_OFFER: {
+						if (rtcTransportDto.offer) {
+							await peerConnection.setRemoteDescription(new RTCSessionDescription(rtcTransportDto.offer))
+							const answer = await peerConnection.createAnswer()
+							await peerConnection.setLocalDescription(answer)
+							const answerTransport = new RtcTransportDTO(user.id, "", RtcActionEnum.SEND_ANSWER, undefined, answer)
+							wsObj.publish({
+								destination: `/app/rtc/${roomUrl}`,
+								body: JSON.stringify(answerTransport)
+							})
+						}
+						break
+					}
+					case RtcActionEnum.ICE_CANDIDATE: {
+						if (rtcTransportDto.iceCandidate) {
+							await peerConnection.addIceCandidate(rtcTransportDto.iceCandidate)
+						}
+						break
+					}
+					default:
+						break
+				}
+			})
+			if (isUserInitiateSession === "join") {
+				const offer = await peerConnection.createOffer()
+				await peerConnection.setLocalDescription(offer)
+				const transport = new RtcTransportDTO(user.id, "", RtcActionEnum.JOIN_ROOM, offer)
+				wsObj.publish({
+					destination: `/app/rtc/${roomUrl}`,
+					body: JSON.stringify(transport)
+				})
+			}
+		}
+		wsObj.activate()
+	}
 
-    const urlCheckResponse = await http.ensureRoomExists(url)
-    setPageStatus(urlCheckResponse.data)
-    if (urlCheckResponse && !urlCheckResponse.data) {
-	 return false
-    }
-    try {
-	 const constraints = {
-	   "video": true,
-	   "audio": true
-	 }
-	 const localStream = await navigator.mediaDevices.getUserMedia(constraints)
-	 setLocalStream(localStream)
-	 const videoElement = document.querySelector("video#localVideo") as HTMLVideoElement
-	 localStream.getTracks().forEach((track) => {
-	   peerConnection.addTrack(track, localStream)
-	 })
-	 if (videoElement) {
-	   setLocalVideoState(true)
-	   videoElement.srcObject = localStream
-	 }
-	 return true
-    } catch (error) {
-	 // eslint-disable-next-line no-console
-	 console.error("Error al acceder a los dispositivos multimedia.", error)
-	 return false
-    }
-  }
+	const changeVideoStatus = (stopVideo: boolean) => {
+		if (currentLocalStream) {
+			if (stopVideo) {
+				currentLocalStream.getTracks().forEach((track) => {
+					track.stop()
+				})
+			} else {
+				currentLocalStream.getTracks().forEach((track) => {
+					peerConnection.addTrack(track, currentLocalStream)
+				})
+			}
+		}
+	}
 
-  const hangOnRoom = () => {
-    peerConnection.close()
-    setCallEnded(true)
-    if (ws) {
-	 const transport = new RtcTransportDTO(currentUserId, groupUrlFromParent, RtcActionEnum.LEAVE_ROOM)
-	 ws.publish({
-	   destination: `/app/rtc/${roomUrl}`,
-	   body: JSON.stringify(transport)
-	 })
-    }
-    if (currentLocalStream) {
-	 currentLocalStream.getTracks().forEach((track) => {
-	   track.stop()
-	 })
-    }
-  }
+	const initRTC = async (): Promise<boolean> => {
+		const url = getUuid(location.pathname)
 
-  return (
-    <Box>
-	 {
-	   isPageAuthorized ?
-		!callEnded &&
-			<>
-				<Box m={2} display={"flex"} justifyContent={"center"}>
-					<Box m={1}>
-						<video style={{ display: localVideoReady ? "block" : "none" }} id="localVideo" width={600}
-							   height={400}
-							   autoPlay playsInline
-							   controls={false}/>
-				  {!localVideoReady &&
-						  <Skeleton variant={"rectangular"} width={600} height={400}/>
-				  }
-					</Box>
-				</Box>
-				<Box position={"fixed"} width={"100%"} bottom={"10px"} display={"flex"} justifyContent={"center"}>
-					<SoundControl/>
-					<VideoControl changeVideoStatus={changeVideoStatus}/>
-					<HangUpControl hangOnRoom={hangOnRoom}/>
-				</Box>
-			</>
-		:
-		<EmptyRoom/>
-	 }
-	 {
-	   callEnded && <CallEnded/>
-	 }
-    </Box>
-  )
+		const urlCheckResponse = await http.ensureRoomExists(url)
+		setPageStatus(urlCheckResponse.data)
+		if (urlCheckResponse && !urlCheckResponse.data) {
+			return false
+		}
+		try {
+			const constraints = {
+				"video": true,
+				"audio": true
+			}
+			const localStream = await navigator.mediaDevices.getUserMedia(constraints)
+			setLocalStream(localStream)
+			const videoElement = document.querySelector("video#localVideo") as HTMLVideoElement
+			localStream.getTracks().forEach((track) => {
+				peerConnection.addTrack(track, localStream)
+			})
+			if (videoElement) {
+				setLocalVideoState(true)
+				videoElement.srcObject = localStream
+			}
+			return true
+		} catch (error) {
+			// eslint-disable-next-line no-console
+			console.error("Error al acceder a los dispositivos multimedia.", error)
+			return false
+		}
+	}
+
+	const hangOnRoom = () => {
+		peerConnection.close()
+		setCallEnded(true)
+		if (ws) {
+			const transport = new RtcTransportDTO(currentUserId, groupUrlFromParent, RtcActionEnum.LEAVE_ROOM)
+			ws.publish({
+				destination: `/app/rtc/${roomUrl}`,
+				body: JSON.stringify(transport)
+			})
+		}
+		if (currentLocalStream) {
+			currentLocalStream.getTracks().forEach((track) => {
+				track.stop()
+			})
+		}
+	}
+
+	return (
+		<Box>
+			{
+				isPageAuthorized ?
+					!callEnded &&
+					<>
+						<Box m={2} display={"flex"} justifyContent={"center"}>
+							<Box m={1}>
+								<video style={{ display: localVideoReady ? "block" : "none" }} id="localVideo" width={600}
+									height={400}
+									autoPlay playsInline
+									controls={false} />
+								{!localVideoReady &&
+									<Skeleton variant={"rectangular"} width={600} height={400} />
+								}
+							</Box>
+						</Box>
+						<Box position={"fixed"} width={"100%"} bottom={"10px"} display={"flex"} justifyContent={"center"}>
+							<SoundControl />
+							<VideoControl changeVideoStatus={changeVideoStatus} />
+							<HangUpControl hangOnRoom={hangOnRoom} />
+						</Box>
+					</>
+					:
+					<EmptyRoom />
+			}
+			{
+				callEnded && <CallEnded />
+			}
+		</Box>
+	)
 }

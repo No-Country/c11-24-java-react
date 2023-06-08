@@ -3,25 +3,22 @@
 }
 
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 1px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #656565;
+  background: #E1E0E0;
   margin-top: -100px;
-  /* background: red; */
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #c4c4c4;
-  /* background: red; */
+  background: #414141;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
   background: #525252;
-  /* background: red; */
 }
 
 .msg {
@@ -31,37 +28,34 @@
 
 .bold-unread-message-light {
   font-weight: bold !important;
-  color: white !important;
+  color: rgb(110, 110, 110) !important;
 }
 
 .bold-unread-message-dark {
   font-weight: bold !important;
-  color: black !important;
+  color: white !important;
 }
 
 .hover-msg-light:hover {
-  background-color: rgba(5, 229, 222, 0.1);
-  /*este color es para el dark, falta para el light */
+  background-color: rgba(110, 0, 255, 0.05);
 }
 
 .hover-msg-dark:hover {
-  background-color: rgba(5, 229, 222, 0.1);
-  /*este color es para el dark, falta para el light */
+  background-color: rgba(5, 229, 222, 0.16);
 }
 
 .selected-group-light {
-  background-color: rgba(110, 229, 222, 0.3) !important;
-  /*este color es para el dark, falta para el light */
+  background-color: rgba(110, 0, 255, 0.1) !important;
+  color: #323232 !important;
 }
 
 .selected-group-dark {
   background-color: rgba(5, 229, 222, 0.3) !important;
-  /*este color es para el dark, falta para el light */
+  color: #b9b9b9 !important;
 }
 
 .group-subtitle-color {
-  color: #787878
-    /* color: red; */
+  color: #8A8A8A;
 }
 
 /************OVERRIDE MATERIAL UI STYLES******************************************************************************/
@@ -164,16 +158,22 @@ color: theme === "dark" ? "#202225" : "white", backgroundColor: theme === "dark"
   transition: transform 0.3s ease-in-out;
 }
 
-.homeBackground {
+.imageBackground {
   background-image: url("LOGUINIMAGE.png");
   background-repeat: no-repeat;
   background-size: 65% auto;
   background-position: bottom left;
 }
 
-.loginBackground {
-  background-image: url("LOGUINIMAGE.png");
+.chatBackgroundDark {
+  background-image: url("backgroundToktuDark.png");
   background-repeat: no-repeat;
-  background-size: 65% auto;
-  background-position: bottom left;
+  background-size: 114% auto;
+  background-position: center;
+}
+.chatBackgroundLight {
+  background-image: url("backgroundToktuLight.png");
+  background-repeat: no-repeat;
+  background-size: 80% auto;
+  background-position: center;
 }

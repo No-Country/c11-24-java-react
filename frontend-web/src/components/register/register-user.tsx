@@ -2,7 +2,7 @@
 
 import CloseIcon from "@mui/icons-material/Close"
 import { Alert, Button, Collapse, Grid, IconButton, Typography, Box } from "@mui/material"
-import React from "react"
+import React, { useEffect} from "react"
 import { Link, useHistory } from "react-router-dom"
 import { useLoaderContext } from "../../context/loader-context"
 import { useThemeContext } from "../../context/theme-context"
@@ -31,6 +31,15 @@ export const RegisterFormComponent = (): JSX.Element => {
 	const refWrapper = React.useRef()
 	const dispatch = useDispatch()
 	const httpService = new HttpService()
+	const rootElement = document.getElementById("root")
+	
+	if (rootElement !== null) {
+		rootElement.style.backgroundColor = theme === "dark" ? "#202225" : "white"
+	}
+	
+	useEffect(() => {
+		document.title = "Registro | TOKTU"
+	}, [])
 
 	function checkFormValidation(): string[] {
 		const validationErrors: string[] = []
@@ -146,9 +155,8 @@ export const RegisterFormComponent = (): JSX.Element => {
 		const re = /\S+@\S+\.\S+/
 		return re.test(String(email).toLowerCase())
 	}
-
 	return (
-		<div className={generateColorMode(theme) + " loginBackground"}
+		<div className={generateColorMode(theme) + " imageBackground"}
 			style={{
 				height: "calc(100% - 64px)"
 			}}>
@@ -157,11 +165,8 @@ export const RegisterFormComponent = (): JSX.Element => {
 					display: "flex",
 					justifyContent: "center"
 				}}>
-					{/* <AccountCircleIcon fontSize={"large"}
-						className={generateIconColorMode(theme)} /> */}
 					<Box m={3}>
 					{theme === "dark" ? <img src="../../toktulogoblanco.png" alt="Logo de la página" width="300"></img> : <img src="../../toktulogo.png" alt="Logo de la página" width="300"></img>}
-					
 				</Box>
 				</div>
 				<div style={{ textAlign: "center" }}>

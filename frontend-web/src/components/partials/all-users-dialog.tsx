@@ -7,6 +7,7 @@ import { GroupUserModel } from "../../interface-contract/group-user-model"
 import { generateIconColorMode } from "../utils/enable-dark-mode"
 
 interface AllUsersDialogType {
+	children: React.ReactNode // "Cargando..." mientras se cargan los usuarios al grupo
 	setOpen: (open: boolean) => void
 	usersList: GroupUserModel[]
 	open: boolean
@@ -15,6 +16,7 @@ interface AllUsersDialogType {
 }
 
 export const AllUsersDialog: React.FunctionComponent<AllUsersDialogType> = ({
+	children,
 	usersList,
 	open,
 	setOpen,
@@ -34,6 +36,7 @@ export const AllUsersDialog: React.FunctionComponent<AllUsersDialogType> = ({
 			fullWidth
 			open={open}>
 			<DialogTitle id="simple-dialog-title">{dialogTitle}</DialogTitle>
+			{children}
 			<List>
 				{
 					usersList && usersList.map((users) => (

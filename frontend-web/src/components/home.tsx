@@ -14,13 +14,22 @@ export const HomeComponent = (): JSX.Element => {
 	useEffect(() => {
 		document.title = "Home | TokTu"
 		setLoading(false)
-	}, [setLoading])
+		// window.onload = () => {
+    //   const rootElement = document.getElementById("root")
+    //   if (rootElement !== null) {
+    //     rootElement.style.backgroundColor =
+    //       theme === "dark" ? "#202225" : "white"
+    //   }
+    // }
+	}, [setLoading])//, theme])
+	
 	const rootElement = document.getElementById("root")
 	if (rootElement !== null) {
 		rootElement.style.backgroundColor = theme === "dark" ? "#202225" : "white"
 	}
+
 	return (
-		<div className={generateColorMode(theme) + " homeBackground"}
+		<div className={generateColorMode(theme) + " imageBackground"}
 			style={{
 				height: "calc(100% - 64px)",
 				textAlign: "center",

@@ -2,7 +2,7 @@ import SendIcon from "@mui/icons-material/Send"
 import HighlightOffIcon from "@mui/icons-material/HighlightOff"
 import ImageIcon from "@mui/icons-material/Image"
 import { Box, Button, CircularProgress, IconButton, Tooltip } from "@mui/material"
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { GroupActionEnum } from "./group-action-enum"
 import { useAuthContext } from "../../context/auth-context"
@@ -33,12 +33,12 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl: string 
 	const dispatch = useDispatch()
 	const [messageId, setLastMessageId] = React.useState(0)
 	const [loadingOldMessages, setLoadingOldMessages] = React.useState<boolean>(false)
-
 	const [imgSrc, setImgSrc] = React.useState("")
 	const [file, setFile] = React.useState<File | null>(null)
 	const [imagePreviewUrl, setImagePreviewUrl] = React.useState<string>("")
 	const [imageLoaded, setImageLoaded] = React.useState(false)
 	const [message, setMessage] = React.useState("")
+	const [grupoActual, setGrupoActual] = useState("")
 	const httpService = new HttpService()
 	let messageEnd: HTMLDivElement | null
 
@@ -82,7 +82,17 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl: string 
 		if (chatHistory && chatHistory.length > 0) {
 			setLastMessageId(chatHistory[0].id)
 		}
+		//console.log(currentGroup.group ? "ws-chat cg: " + currentGroup.group.name : "Unknown group")
 	}, [chatHistory])
+
+	
+	useEffect(() => {
+		const grupoActualizado = document.getElementById("selected-group-light")
+		if (grupoActualizado) {
+			setGrupoActual(grupoActualizado.innerHTML)
+		}
+		//console.log("ws-chat cg ACA: " + grupoActualizado)
+	}, )
 
 	function styleSelectedMessage() {
 		return theme === "dark" ? "hover-msg-dark" : "hover-msg-light"
@@ -219,7 +229,8 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl: string 
 						display: "flex",
 						flex: "1",
 						flexDirection: "column",
-						maxWidth: "45%"
+						maxWidth: "35%",
+						color: theme === "dark" ? "gray" : "rgba(110, 0, 255, 0.3)"
 					}}>
 						<NoDataComponent />
 					</div>
@@ -229,7 +240,7 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl: string 
 						flex: "1",
 						flexDirection: "column",
 						maxWidth: "45%",
-						textAlign: "center"
+						textAlign: "left"
 					}}>
 						<div style={{
 							width: "100%",
@@ -240,9 +251,9 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl: string 
 								<span style={{
 									fontSize: "20px",
 									fontWeight: "bold",
-									width: "100%", 
-									textAlign: "center"
-								}}>{currentGroup.group.name}</span>
+									width: "100%",
+									textAlign: "left"
+								}}>{grupoActual}</span>
 								<ActiveVideoCall isAnyCallActive={currentGroup.groupCall.anyCallActive} />
 							</Box>
 						</div>
@@ -253,7 +264,7 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl: string 
 								width: "100%",
 								height: "calc(100% - 56px)",
 								overflowY: "scroll"
-							}}>
+							}} className={theme === "light" ? "chatBackgroundLight" : "chatBackgroundDark"}>
 							{
 								!allMessagesFetched && loadingOldMessages &&
 								<div style={{
@@ -274,7 +285,7 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl: string 
 										}}>
 											<CircularProgress style={{ margin: "5px" }} size={40} />
 										</div>
-										<span style={{ fontSize: "16px" }}>Cargando mensajes anteriores ....</span>
+										<span style={{ fontSize: "16px", fontStyle: "italic" }}>Cargando mensajes anteriores...</span>
 									</div>
 								</div>
 							}
@@ -309,7 +320,7 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl: string 
 												border: `1px solid ${generateIconColorMode(theme)}`,
 												lineHeight: "37px"
 											}}>
-												<div style={{ color: "#FFFFFF" }}>{messageModel.initials}</div>
+												<div style={{color: theme === "dark" ? "white" : "gray"}}>{messageModel.initials}</div>
 											</div>
 										}
 										<div style={{ margin: "4px" }}>
@@ -397,7 +408,7 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl: string 
 								</label>
 								<CustomTextField
 									id={"inputChatMessenger"}
-									label={"Enviar un mensaje"}
+									label={"Escribe tu mensaje aqui..."}
 									value={message}
 									onClick={markMessageSeen}
 									handleChange={(event: any) => handleChange(event)}
@@ -413,7 +424,6 @@ export const WebSocketChatComponent: React.FunctionComponent<{ groupUrl: string 
 									style={{
 										marginLeft: "3px",
 										maxWidth: "20px",
-										// backgroundColor: !imageLoaded && message === "" ? "white" : "transparent",
 									}}
 									disabled={!imageLoaded && message === ""}
 								>

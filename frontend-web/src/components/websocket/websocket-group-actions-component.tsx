@@ -42,17 +42,27 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
 	const [isCurrentUserAdmin, setCurrentUserIsAdmin] = useState(false)
 	const [toolTipAction, setToolTipAction] = useState(false)
 	const [openTooltipId, setToolTipId] = useState<number | null>(null)
+	const [loadingContacts, setLoadingContacts] = useState(false)
+	const [loadingMembers, setLoadingMembers] = useState(false)
+	const [addingUser, setAddingUser] = useState(false)
+	const [deletingMember, setDeletingMember] = useState(false)
+	const [grantingAdmin, setGrantingAdmin] = useState(false)
+	const [removingAdmin, setRemovingAdmin] = useState(false)
+	const [leavingGroup, setLeavingGroup] = useState(false)
+
 	const { theme } = useThemeContext()
 	const dispatch = useDispatch()
 	const { ws } = useWebSocketContext()
 	const httpService = new HttpService()
 	const { user } = useAuthContext()
 
+	// Obtener el grupo activo actual y los grupos disponibles del estado global
 	const {
 		currentActiveGroup,
 		groups
 	} = useSelector((state: StoreState) => state.globalReducer)
 
+	// Limpia los datos cuando el grupo activo actual cambia o el componente se desmonta
 	useEffect(() => {
 		clearData()
 		return () => {
@@ -60,6 +70,7 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
 		}
 	}, [currentActiveGroup])
 
+	// Maneja las acciones de los tooltips
 	function handleTooltipAction(event: any, action: string) {
 		event.preventDefault()
 		if (action === GroupActionEnum.OPEN) {
@@ -71,6 +82,7 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
 		}
 	}
 
+	// Limpia los datos del componente
 	function clearData() {
 		setAllUsers([])
 		setToolTipAction(false)
@@ -81,59 +93,87 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
 		setParamsOpen(false)
 	}
 
+	// Maneja la acción de mostrar un usuario específico
 	function handleDisplayUserAction(event: any, id: number) {
 		event.preventDefault()
 		setToolTipId(id)
 	}
 
+	// Cierra la acción de mostrar un usuario específico
 	function closeDisplayUserAction(event: any) {
 		event.preventDefault()
 		setToolTipAction(false)
 		setToolTipId(null)
 	}
 
+	// Maneja el clic en diferentes acciones del grupo
 	async function handleClick(event: React.MouseEvent<HTMLElement>, action: string) {
 		event.preventDefault()
+
 		switch (action) {
+			// Acción de parámetros del grupo
 			case GroupActionEnum.PARAM:
+				// Si no se han cargado los usuarios en conversación, se obtienen del servidor
 				if (usersInConversation.length === 0) {
+					setLoadingMembers(true)
 					const res = await httpService.fetchAllUsersInConversation(groupUrl)
 					res.data.forEach((groupUserModel) => {
+						// Verifica si el usuario actual es administrador del grupo
 						if (groupUserModel.userId === user?.id && groupUserModel.admin) {
 							setCurrentUserIsAdmin(true)
 						}
 					})
 					setUsersInConversation(res.data)
+
 				}
+				// Cambia el estado de apertura de los parámetros del grupo
 				setParamsOpen(!paramsOpen)
+				setLoadingMembers(false)
 				break
 			default:
 				throw new Error("Error, por favor actualiza la página.")
 		}
 	}
 
+	// Maneja el estado del cuadro emergente
 	function handlePopupState(isOpen: boolean) {
 		setPopupOpen(isOpen)
 	}
 
+	// Maneja la acción de agregar un usuario al grupo
 	async function handleAddUserAction(action: string) {
 		switch (action) {
+			// Abre el cuadro emergente de agregar usuario y carga los usuarios disponibles del servidor
 			case GroupActionEnum.OPEN:
 				handlePopupState(true)
-				if (allUsers.length === 0) {
+				setLoadingContacts(true)
+				try {
 					const res = await httpService.fetchAllUsersWithoutAlreadyInGroup(groupUrl)
 					setAllUsers(res.data)
+				} catch (error) {
+					dispatch(setAlerts({
+						alert: {
+							text: "Error al obtener los usuarios. Por favor, inténtalo de nuevo más tarde.",
+							alert: "error",
+							isOpen: true
+						}
+					}))
+				} finally {
+					setLoadingContacts(false)
 				}
 				break
+			// Cierra el cuadro emergente de agregar usuario
 			case GroupActionEnum.CLOSE:
 				handlePopupState(false)
 				break
 			default:
-				throw new Error("Cannot handle AddUserAction")
+				throw new Error("No se pudo agregar el Usuario")
 		}
 	}
 
+	// Maneja la acción de salir del grupo
 	function leaveGroup(userId: number) {
+		setLeavingGroup(true)
 		if (ws) {
 			const transport = new TransportModel(userId, TransportActionEnum.LEAVE_GROUP, undefined, groupUrl)
 			ws.publish({
@@ -141,9 +181,12 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
 				body: JSON.stringify(transport)
 			})
 		}
+		setLeavingGroup(false)
 	}
 
+	// Maneja la acción de eliminar un usuario de la lista de administradores en la conversación
 	async function removeUserFromAdminListInConversation(userId: string | number) {
+		setRemovingAdmin(true)
 		try {
 			const res = await httpService.removeAdminUserInConversation(userId, groupUrl)
 			const users = [...usersInConversation]
@@ -168,9 +211,12 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
 				}
 			}))
 		}
+		setRemovingAdmin(false)
 	}
 
+	// Maneja la acción de otorgar permisos de administrador a un usuario en la conversación
 	async function grantUserAdminInConversation(userId: number | string) {
+		setGrantingAdmin(true)
 		try {
 			const res = await httpService.grantUserAdminInConversation(userId, groupUrl)
 			dispatch(setAlerts({
@@ -195,9 +241,12 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
 				}
 			}))
 		}
+		setGrantingAdmin(false)
 	}
 
+	// Maneja la acción de agregar un usuario a la conversación del grupo
 	async function addUserInConversation(userId: string | number) {
+		setAddingUser(true)
 		try {
 			const res = await httpService.addUserToGroup(userId, groupUrl)
 			const users = [...usersInConversation]
@@ -221,9 +270,12 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
 		} finally {
 			setPopupOpen(false)
 		}
+		setAddingUser(false)
 	}
 
+	// Maneja la acción de eliminar un usuario de la conversación del grupo
 	async function removeUserFromConversation(userId: string | number) {
+		setDeletingMember(true)
 		try {
 			const res = await httpService.removeUserFromConversation(userId, groupUrl)
 			dispatch(setAlerts({
@@ -246,21 +298,25 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
 				}
 			}))
 		}
+		setDeletingMember(false)
 	}
 
 	return (
 		<div>
+			{/* Barra lateral */}
 			<div className={"sidebar"}>
 				<List
 					component="nav">
-					<ListItemButton disabled={groups.length === 0 || !currentActiveGroup}
+					{/* Botón "Agregar usuario al grupo" */}
+					<ListItemButton disabled={groups.length === 0 || !currentActiveGroup || loadingMembers || addingUser || deletingMember || grantingAdmin || removingAdmin ||leavingGroup}
 						onClick={() => handleAddUserAction(GroupActionEnum.OPEN)}>
 						<ListItemIcon>
 							<GroupAddIcon style={{ color: generateIconColorMode(theme) }} />
 						</ListItemIcon>
 						<ListItemText primary="Agregar usuario al grupo" />
 					</ListItemButton>
-					<ListItemButton disabled={groups.length === 0 || !currentActiveGroup}
+					{/* Botón "Miembros" */}
+					<ListItemButton disabled={groups.length === 0 || !currentActiveGroup || loadingMembers || addingUser || deletingMember || grantingAdmin || removingAdmin || leavingGroup}
 						onClick={(event) => handleClick(event, GroupActionEnum.PARAM)}>
 						<ListItemIcon>
 							<GroupIcon style={{ color: generateIconColorMode(theme) }} />
@@ -268,10 +324,15 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
 						<ListItemText primary="Miembros" />
 						{paramsOpen ? <ExpandLess /> : <ExpandMore />}
 					</ListItemButton>
+					{/* Lista de miembros */}
+					{loadingMembers &&
+						<div style={{ margin: "1% 0 0 17%" }}>Cargando Miembros...</div>}
 					<Collapse in={paramsOpen}>
+
+
 						<List component="div" disablePadding>
 							{paramsOpen && usersInConversation.map((value, index) => (
-								<ListItem key={index}
+								<ListItem key={index} disabled={loadingMembers || addingUser || deletingMember || grantingAdmin || removingAdmin || leavingGroup}
 									onMouseEnter={(event) => handleDisplayUserAction(event, index)}
 									onMouseLeave={event => closeDisplayUserAction(event)}>
 									<ListItemIcon>
@@ -286,7 +347,7 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
 									<ListItemText primary={value.firstName + " " + value.lastName}
 										secondary={
 											<React.Fragment>
-												<span className={generateClassName(theme)}>
+												<span className={generateClassName(theme)} >
 													{
 
 														value.admin
@@ -300,6 +361,7 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
 										onMouseEnter={event => handleDisplayUserAction(event, index)}
 										onMouseLeave={event => closeDisplayUserAction(event)}
 									>
+										{/* Tooltip */}
 										{openTooltipId === index
 											? <Tooltip
 												PopperProps={{
@@ -313,31 +375,32 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
 												title={
 													<React.Fragment>
 														<div>
+															{/* Opciones del tooltip */}
 															{
 																isCurrentUserAdmin && value.admin &&
-																<MenuItem
+																<MenuItem disabled={loadingMembers || addingUser || deletingMember || grantingAdmin || removingAdmin || leavingGroup}
 																	onClick={() => removeUserFromAdminListInConversation(value.userId)}
-																	dense={true}>Remove from administrator
+																	dense={true}>Quitar administrador
 																</MenuItem>
 															}
 															{
 																isCurrentUserAdmin && !value.admin &&
-																<MenuItem
+																<MenuItem disabled={loadingMembers || addingUser || deletingMember || grantingAdmin || removingAdmin || leavingGroup}
 																	onClick={() => grantUserAdminInConversation(value.userId)}
-																	dense={true}>Grant
-																	administrator</MenuItem>
+																	dense={true}>Designar administrador
+																</MenuItem>
 															}
 															{
 																!(user?.id === value.userId) &&
-																<MenuItem
+																<MenuItem disabled={loadingMembers || addingUser || deletingMember || grantingAdmin || removingAdmin || leavingGroup}
 																	onClick={() => removeUserFromConversation(value.userId)}
-																	dense={true}>Remove from group</MenuItem>
+																	dense={true}>Eliminar del grupo</MenuItem>
 															}
 															{
 																user?.id === value.userId &&
-																<MenuItem
+																<MenuItem disabled={loadingMembers || addingUser || deletingMember || grantingAdmin || removingAdmin || leavingGroup}
 																	onClick={() => leaveGroup(Number(value.userId))}
-																	dense={true}>Leave group</MenuItem>
+																	dense={true}>Abandonar grupo</MenuItem>
 															}
 														</div>
 													</React.Fragment>
@@ -357,8 +420,26 @@ export const WebSocketGroupActionComponent: React.FunctionComponent<{ groupUrl: 
 					</Collapse>
 				</List>
 			</div>
-			<AllUsersDialog usersList={allUsers} open={popupOpen} setOpen={handlePopupState}
-				dialogTitle={"Agregar contacto a la conversación"} action={addUserInConversation} />
+			{
+				addingUser ? (
+					<div style={{ margin: "1% 0 0 17%" }}>Agregando usuario...</div>
+				) : (
+					<AllUsersDialog
+						usersList={allUsers}
+						open={popupOpen}
+						setOpen={handlePopupState}
+						dialogTitle={"Agregar usuario a la conversación"}
+						action={addUserInConversation}
+					>
+						{/* Mensaje de carga de usuarios */}
+						{loadingContacts && <div>Cargando usuarios...</div>}
+					</AllUsersDialog>
+				)
+			}
+			{deletingMember && <div style={{ margin: "1% 0 0 17%" }}>Eliminando usuario...</div>}
+			{grantingAdmin && <div style={{ margin: "1% 0 0 17%" }}>Designando Administrador...</div>}
+			{removingAdmin && <div style={{ margin: "1% 0 0 17%" }}>Quitando Administrador...</div>}
+			{leavingGroup && <div style={{ margin: "1% 0 0 17%" }}>Saliendo del Grupo...</div>}
 		</div>
 	)
 }

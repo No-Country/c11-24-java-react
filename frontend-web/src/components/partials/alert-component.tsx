@@ -8,7 +8,6 @@ export const AlertComponent: React.FunctionComponent = () => {
   const { alerts } = useSelector((state: StoreState) => state.globalReducer)
   const dispatch = useDispatch()
   const timeoutRef = useRef<NodeJS.Timeout[]>([])
-
   function closeAlert(id?: string) {
     if (!id) {
       return
@@ -20,33 +19,28 @@ export const AlertComponent: React.FunctionComponent = () => {
     allAlerts[indexToDelete] = eltToDelete
     dispatch(setAllAlerts({ allAlerts }))
   }
-
   useEffect(() => {
-    // Función para cerrar una alerta después de 5 segundos
+    // Función para cerrar una alerta después de 3 segundos
     function closeAlertAfterDelay(id: string) {
       const timeoutId = setTimeout(() => {
         closeAlert(id)
-      }, 2000)
+      }, 3000)
       timeoutRef.current.push(timeoutId)
     }
-
     // Cerrar todas las alertas anteriores
     timeoutRef.current.forEach((timeoutId) => clearTimeout(timeoutId))
     timeoutRef.current = []
-
     // Iniciar el temporizador para cada alerta
     alerts.forEach((alert) => {
       if (alert.id) {
         closeAlertAfterDelay(alert.id)
       }
     })
-
     // Limpiar las referencias al desmontar el componente
     return () => {
       timeoutRef.current.forEach((timeoutId) => clearTimeout(timeoutId))
     }
   }, [alerts, closeAlert])
-
   return (
     <div style={{
       position: "absolute",
