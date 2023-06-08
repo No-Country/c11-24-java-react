@@ -149,7 +149,7 @@ export const LoginComponent: React.FunctionComponent = () => {
 				<Box m={6}>
 					<Grid container spacing={2}>
 						<Grid item xs={12}>
-							<CustomTextField id={"loginUserNameInput"}
+							<CustomTextField id={"loginUsernameInput"}
 								label={"Usuario"}
 								name={"username"}
 								value={username || JSON.parse(localStorage.getItem("userData") ?? "{}").username}

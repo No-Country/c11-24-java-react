@@ -64,9 +64,9 @@ export class HttpService {
     return this.instance.get("users/all/" + groupUrl, {})
   }
 
-  createUser(username: string, lastname: string, email: string, password: string): Promise<AxiosResponse> {
+  createUser(firstname: string, lastname: string, email: string, password: string): Promise<AxiosResponse> {
     return this.instance.post("user/register", {
-      username,
+	    firstname,
       lastname,
       email,
       password
