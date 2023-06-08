@@ -1,7 +1,8 @@
 import { Client } from "@stomp/stompjs"
 import { UUIDv4 } from "../utils/uuid-generator"
 
-const WS_URL = process.env.NODE_ENV === "development" ? "localhost:9090/" : "localhost:9090/"
+// const WS_URL = process.env.NODE_ENV === "development" ? "localhost:9090/" : "localhost:9090/"
+const WS_URL = process.env.NODE_ENV === "development" ? "18.229.255.151:9090/" : "18.229.255.151:9090/"
 
 const WS_BROKER = process.env.NODE_ENV === "development" ? "ws" : "wss"
 

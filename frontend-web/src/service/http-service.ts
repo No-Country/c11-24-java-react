@@ -11,7 +11,9 @@ export class HttpService {
   private instance: AxiosInstance
 
   constructor() {
-    const baseURL = process.env.NODE_ENV === "development" ? "http://localhost:9090/api" : "http://production-url.com/api"
+    // const baseURL = process.env.NODE_ENV === "development" ? "http://localhost:9090/api" : "http://production-url.com/api"
+    const baseURL = process.env.NODE_ENV === "development" ? "http://18.229.255.151:9090/api" : "http://18.229.255.151:9090/api"
+    
     this.instance = axios.create({
       withCredentials: true,
       baseURL
@@ -41,7 +43,8 @@ export class HttpService {
   }
 
   public async ensureRoomExists(roomId: string): Promise<AxiosResponse<boolean>> {
-    return await axios.get(`http://localhost:9090/room/ensure-room-exists/${roomId}`, { withCredentials: true })
+    // return await axios.get(`http://localhost:9090/room/ensure-room-exists/${roomId}`, { withCredentials: true })
+    return await axios.get(`http://18.229.255.151:9090/room/ensure-room-exists/${roomId}`, { withCredentials: true })
   }
 
   public logout(): Promise<AxiosResponse> {
